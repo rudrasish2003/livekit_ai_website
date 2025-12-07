@@ -1,6 +1,6 @@
 import logging
 import asyncio
-
+import chromadb
 from dotenv import load_dotenv
 from livekit import rtc
 from livekit.agents import (
@@ -34,6 +34,9 @@ class Assistant(Agent):
             Do not use emojis or complex formatting.
             If you do not know an answer, politely offer to transfer them to a human supervisor.""",
         )
+        self.chroma_client = chromadb.PersistentClient(path="./vector_db")
+        self.collection = self.chroma_client.get_or_create_collection(name="web_chunks",)
+        self.db_fetch_size = 3
 
     @function_tool
     async def lookup_weather(self, context: RunContext, location: str):
@@ -41,6 +44,19 @@ class Assistant(Agent):
         logger.info(f"Looking up weather for {location}")
         await asyncio.sleep(5)
         return "sunny with a temperature of 70 degrees."
+    
+    @function_tool
+    async def lookup_website_information(self, context: RunContext, question: str):
+        """Use this tool to answer any questions about Indus net Technologies."""
+        logger.info(f"looking for {question}")
+        await asyncio.sleep(5)
+        results = self.collection.query(
+                query_texts=[question],
+                n_results=self.db_fetch_size
+            )
+        documents = results.get("documents", [])
+        logger.info(documents)
+        return documents
 
 server = AgentServer()
 
