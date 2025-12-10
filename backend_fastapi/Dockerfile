@@ -28,6 +28,6 @@ CMD ["/entrypoint.sh"]
 
 
 # Docker build command
-# docker build -t shubhamint/ai_website_backend_livekit:latest .
+# docker build -t shubhamint/ai_website_backend_fastapi:latest .
 # Docker run command
-# docker run -d -p 8000:8000 shubhamint/ai_website_backend_livekit:latest
+# docker run -d -p 8000:8000 shubhamint/ai_website_backend_fastapi:latest
