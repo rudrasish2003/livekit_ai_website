@@ -75,9 +75,9 @@ async def my_agent(ctx: JobContext):
         ),
     )
 
-    # --- Background Audio Setup --- 
-    background_audio = BackgroundAudioPlayer(ambient_sound="D:/code/ai_website/livekit_ai_website/office-ambience-6322.mp3")
-    await background_audio.start(room=ctx.room, agent_session=session)
+    # # --- Background Audio Setup --- 
+    # background_audio = BackgroundAudioPlayer(ambient_sound="D:/code/ai_website/livekit_ai_website/office-ambience-6322.mp3")
+    # await background_audio.start(room=ctx.room, agent_session=session)
         
     # --- INITIATING SPEECH (The Agent Speaks First) ---
     welcome_message = "Welcome to Indus Net Technologies. I am marin. How can I help you today?"
