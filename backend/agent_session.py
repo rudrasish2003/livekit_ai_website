@@ -18,7 +18,8 @@ from agents.web_agent import Webagent
 from livekit.plugins.openai import realtime
 from openai.types.beta.realtime.session import TurnDetection
 import os
-
+import json
+import asyncio
 
 logger = logging.getLogger("agent")
 load_dotenv(override=True)
@@ -44,8 +45,6 @@ async def my_agent(ctx: JobContext):
 
     session = AgentSession(
         llm=realtime.RealtimeModel(
-            # model = "gpt-realtime",
-            # voice="cedar",
             turn_detection=TurnDetection(
                 type="semantic_vad",
                 eagerness="medium",
@@ -53,12 +52,12 @@ async def my_agent(ctx: JobContext):
                 interrupt_response=True,
                 idle_timeout_ms=30000
             ),
-            modalities = ['text']
+            modalities = ['text', 'audio'],
         ),
-        tts=inference.TTS(model="cartesia/sonic-3", voice="9cebb910-d4b7-4a4a-85a4-12c79137724c"),
-        turn_detection=MultilingualModel(),
-        vad=silero.VAD.load(min_speech_duration=0.3, activation_threshold=0.7),
-        preemptive_generation=True,
+        # tts=inference.TTS(model="cartesia/sonic-3", voice="9cebb910-d4b7-4a4a-85a4-12c79137724c"),
+        # turn_detection=MultilingualModel(),
+        # vad=silero.VAD.load(min_speech_duration=0.3, activation_threshold=0.7),
+        preemptive_generation=False,
         use_tts_aligned_transcript=True,
     )
 
@@ -69,7 +68,43 @@ async def my_agent(ctx: JobContext):
             AudioConfig(BuiltinAudioClip.KEYBOARD_TYPING, volume=0.6),
         ],
     )
-      
+    
+    # ---- REGISTER EVENTS FIRST ----
+
+    @session.on("turn_start")
+    def on_turn_start():
+        session.context.state["pending_flashcards"] = []
+        
+    @session.on("transcription_final")
+    def on_transcription_final(segment):
+        asyncio.create_task(handle_transcription(segment))
+
+    async def handle_transcription(segment):
+        cards = session.context.state.get("pending_flashcards", [])
+        if not cards:
+            return
+
+        for card in cards:
+            if card["emitted"]:
+                continue
+
+            if card["value"].lower() in segment.text.lower():
+                payload = {
+                    "type": "flashcard",
+                    "anchorSegmentId": segment.id,
+                    "title": card["title"],
+                    "value": card["value"],
+                }
+
+                await ctx.room.local_participant.publish_data(
+                    json.dumps(payload).encode("utf-8"),
+                    reliable=True,
+                    topic="ui.flashcard",
+                )
+
+                card["emitted"] = True
+                
+    # ---- START SESSION ----
 
     # Start the session
     await session.start(
@@ -84,7 +119,7 @@ async def my_agent(ctx: JobContext):
         ),
     )
 
-    # # --- Background Audio Setup --- 
+    # --- Background Audio Setup --- 
     try:
         await background_audio.start(room=ctx.room, agent_session=session)
         logger.info("Background audio started")

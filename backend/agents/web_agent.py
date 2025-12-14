@@ -3,7 +3,7 @@ from livekit.agents import (Agent,
                             RunContext)
 import chromadb
 import logging
-from openai import OpenAI
+import uuid
 from agents.agent_prompts import WEB_AGENT_PROMPT
 
 logger = logging.getLogger("agent")
@@ -37,3 +37,25 @@ class Webagent(Agent):
                             if line.strip() and (i == 0 or line.strip() != joined.splitlines()[i-1].strip()))
 
         return cleaned
+    
+    @function_tool
+    async def emit_flashcard(
+        self,
+        context: RunContext,
+        title: str,
+        value: str,
+    ):
+        """
+        Emit a flashcard fact.
+        This tool is called by the LLM during answer generation.
+        """
+        logger.info("Emitting flashcard...")
+        session_ctx = context.session.context
+        cards = session_ctx.metadata.setdefault("pending_flashcards", [])
+        cards.append({
+            "id": title.lower().replace(" ", "_"),
+            "title": title,
+            "value": value,
+            "emitted": False,
+        })
+
