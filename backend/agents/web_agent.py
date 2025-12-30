@@ -6,6 +6,7 @@ import logging
 import json
 from agents.agent_prompts import WEB_AGENT_PROMPT
 
+
 logger = logging.getLogger("agent")
 
 class Webagent(Agent):

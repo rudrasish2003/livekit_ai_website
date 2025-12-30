@@ -14,7 +14,8 @@ from livekit.agents import (
 )
 from livekit.plugins import noise_cancellation, silero, openai
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
-from agents.web_agent import Webagent
+# from agents.web_agent import Webagent
+from agents.invoice_agent import InvoiceAgent
 from livekit.plugins.openai import realtime
 from openai.types.beta.realtime.session import TurnDetection
 import os
@@ -29,7 +30,7 @@ server = AgentServer(
     ws_url=os.getenv("LIVEKIT_URL"),
 )
 
-@server.rtc_session(agent_name="my_agent")
+@server.rtc_session()
 async def my_agent(ctx: JobContext):
     session = AgentSession(
         llm=realtime.RealtimeModel(
@@ -61,7 +62,7 @@ async def my_agent(ctx: JobContext):
 
     # Start the session
     await session.start(
-        agent=Webagent(room=ctx.room),
+        agent=InvoiceAgent(room=ctx.room),
         room=ctx.room,
         room_options=room_io.RoomOptions(
             audio_input=room_io.AudioInputOptions(
@@ -80,7 +81,8 @@ async def my_agent(ctx: JobContext):
         logger.warning(f"Could not start background audio: {e}", exc_info=True)
         
     # --- INITIATING SPEECH (The Agent Speaks First) ---
-    welcome_message = "Welcome to Indus Net Technologies. I am Aarti. How can I help you today?"
+    #welcome_message = "Welcome to Indus Net Technologies. I am Aarti. How can I help you today?"
+    welcome_message = "Hii, This is VYOM calling from ITC’s accounts team."
     await session.say(text=welcome_message, allow_interruptions=True)
 
 if __name__ == "__main__":
