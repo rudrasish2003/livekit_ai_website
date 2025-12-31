@@ -18,6 +18,7 @@ from agents.web_agent import Webagent
 from agents.invoice_agent import InvoiceAgent
 from agents.restaurant_agent import RestaurantAgent
 from livekit.plugins.openai import realtime
+from livekit.plugins import openai
 from livekit.plugins import cartesia
 from openai.types.beta.realtime.session import TurnDetection
 import os
@@ -60,7 +61,7 @@ async def my_agent(ctx: JobContext):
             api_key=os.getenv("OPENAI_API_KEY")
         ),
         tts=inference.TTS(model="cartesia/sonic-3", voice="209d9a43-03eb-40d8-a7b7-51a6d54c052f"), # Anita
-        #tts=cartesia.TTS(model="sonic-3", voice="209d9a43-03eb-40d8-a7b7-51a6d54c052f",api_key=os.getenv("CARTESIA_API_KEY")),
+        # tts=cartesia.TTS(model="sonic-3", voice="209d9a43-03eb-40d8-a7b7-51a6d54c052f",api_key=os.getenv("CARTESIA_API_KEY")),
 
         turn_detection=MultilingualModel(),
         vad=silero.VAD.load(min_speech_duration=0.3, activation_threshold=0.7),
