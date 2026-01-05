@@ -17,6 +17,7 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from agents.web_agent import Webagent
 from agents.invoice_agent import InvoiceAgent
 from agents.restaurant_agent import RestaurantAgent
+from agents.banking_agent import BankingAgent
 from livekit.plugins.openai import realtime
 from livekit.plugins import openai
 from livekit.plugins import cartesia
@@ -33,7 +34,8 @@ load_dotenv(override=True)
 AGENT_TYPES = {
     "web": Webagent,
     "invoice": InvoiceAgent,
-    "restaurant": RestaurantAgent
+    "restaurant": RestaurantAgent,
+    "bank": BankingAgent
 }
 
 

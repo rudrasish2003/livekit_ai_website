@@ -14,9 +14,9 @@ export default function App() {
   const [token, setToken] = useState<string>('');
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [agent, setAgent] = useState<'web' | 'invoice' | 'restaurant'>('web');
+  const [agent, setAgent] = useState<'web' | 'invoice' | 'restaurant' | 'bank'>('web');
 
-  const connect = useCallback(async (chosenAgent: 'web' | 'invoice' | 'restaurant' = agent) => {
+  const connect = useCallback(async (chosenAgent: 'web' | 'invoice' | 'restaurant' | 'bank' = agent) => {
     setConnecting(true);
     setError(null);
     try {
@@ -109,6 +109,16 @@ export default function App() {
                 className="group relative w-full max-w-xs mx-auto py-4 px-8 bg-primary hover:bg-primary-hover text-white text-lg rounded-full font-semibold transition-all shadow-lg hover:shadow-primary/30 hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
               >
                 Restaurant Agent
+              </button>
+              <button
+                onClick={() => {
+                  setAgent('bank');
+                  connect('bank');
+                }}
+                disabled={connecting}
+                className="group relative w-full max-w-xs mx-auto py-4 px-8 bg-primary hover:bg-primary-hover text-white text-lg rounded-full font-semibold transition-all shadow-lg hover:shadow-primary/30 hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+              >
+                Banking Agent
               </button>
             </div>
 
