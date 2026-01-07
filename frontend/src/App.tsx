@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { LiveKitRoom, RoomAudioRenderer, StartAudio } from '@livekit/components-react';
 import VoiceAssistant from './components4_bank/VoiceAssistant';
-import BankingVoiceAssistant from './components4_bank/BankingVoiceAssistant';
+import BankingVoiceAssistant from './components4_bank/banking/BankingVoiceAssistant';
+import BankingPreview from './components4_bank/banking/BankingPreview';
 import { Header } from './components4_bank/Header';
 import { AlertCircle, Mic } from 'lucide-react';
 
@@ -16,6 +17,7 @@ export default function App() {
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agent, setAgent] = useState<'web' | 'invoice' | 'restaurant' | 'bank' | 'translation'>('web');
+  const [showBankingPreview, setShowBankingPreview] = useState(false);
 
   const connect = useCallback(async (chosenAgent: 'web' | 'invoice' | 'restaurant' | 'bank' | 'translation' = agent) => {
     setConnecting(true);
@@ -50,6 +52,20 @@ export default function App() {
   }, [agent]);
 
   if (!token) {
+    if (showBankingPreview && agent === 'bank') {
+      return <BankingPreview
+        onConnect={() => {
+          // Stay in preview mode (visually) until token is ready
+          connect('bank');
+        }}
+        onBack={() => {
+          setShowBankingPreview(false);
+          setAgent('web');
+          setToken('');
+        }}
+      />;
+    }
+
     return (
       <div className="flex flex-col min-h-screen bg-background text-text-main font-sans selection:bg-primary/20">
         <Header status="disconnected" />
@@ -114,7 +130,8 @@ export default function App() {
               <button
                 onClick={() => {
                   setAgent('bank');
-                  connect('bank');
+                  setShowBankingPreview(true); // Don't connect yet, show preview
+                  // connect('bank'); 
                 }}
                 disabled={connecting}
                 className="group relative w-full max-w-xs mx-auto py-4 px-8 bg-primary hover:bg-primary-hover text-white text-lg rounded-full font-semibold transition-all shadow-lg hover:shadow-primary/30 hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
@@ -160,10 +177,26 @@ export default function App() {
       }}
       onDisconnected={() => {
         setToken('');
+        // If we were in banking mode, maybe go back to preview? 
+        // For now, let's go back to main menu or preview.
+        if (agent === 'bank') {
+          setShowBankingPreview(true);
+        }
       }}
     >
       {/* <VoiceAssistant /> */}
-      {agent === 'bank' ? <BankingVoiceAssistant /> : <VoiceAssistant />}
+      {agent === 'bank' ? (
+        <BankingVoiceAssistant onBack={() => {
+          setShowBankingPreview(false);
+          setAgent('web');
+          setToken('');
+          // Disconnect happens effectively by unmounting/token clear but explicit disconnect is good
+          // Note: handleDisconnect in BVA disconnects room. onDisconnected prop in LiveKitRoom calls logic.
+          // But we want to go HOME.
+        }} />
+      ) : (
+        <VoiceAssistant />
+      )}
       <RoomAudioRenderer />
       <StartAudio label="Click to allow audio playback" />
     </LiveKitRoom>
