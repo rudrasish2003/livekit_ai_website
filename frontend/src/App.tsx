@@ -1,8 +1,7 @@
 import { useState, useCallback } from 'react';
 import { LiveKitRoom, RoomAudioRenderer, StartAudio } from '@livekit/components-react';
 import VoiceAssistant from './components4_bank/VoiceAssistant';
-// import BankingVoiceAssistant from './components4_bank/BankingVoiceAssistant';
-import BankingVoiceAssistant from './components4_bank/BVA';
+import BankingVoiceAssistant from './components4_bank/BankingVoiceAssistant';
 import { Header } from './components4_bank/Header';
 import { AlertCircle, Mic } from 'lucide-react';
 
@@ -29,9 +28,9 @@ export default function App() {
       if (!response.ok) {
         throw new Error(`Server returned ${response.status}: ${response.statusText}`);
       }
-      
+
       const accessToken = await response.text();
-      
+
       if (!accessToken || accessToken.trim().length === 0) {
         throw new Error("Received empty token from backend");
       }
@@ -40,9 +39,9 @@ export default function App() {
       console.error("Connection failed:", err);
       let msg = "Failed to connect to backend.";
       if (err.message && err.message.includes('Failed to fetch')) {
-          msg = `Could not reach server at ${BACKEND_URL}. Ensure your backend is running.`;
+        msg = `Could not reach server at ${BACKEND_URL}. Ensure your backend is running.`;
       } else if (err.message) {
-          msg = err.message;
+        msg = err.message;
       }
       setError(msg);
     } finally {
@@ -53,17 +52,17 @@ export default function App() {
   if (!token) {
     return (
       <div className="flex flex-col min-h-screen bg-background text-text-main font-sans selection:bg-primary/20">
-        <Header status="disconnected"/>
+        <Header status="disconnected" />
 
         <main className="flex-1 flex flex-col items-center justify-center p-5 relative overflow-hidden">
-          
+
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
           <div className="max-w-xl w-full text-center space-y-10 animate-fade-in-up relative z-10">
-            
+
             <div className="space-y-6">
               <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto text-primary shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-border">
-                 <Mic size={40} strokeWidth={1.5} />
+                <Mic size={40} strokeWidth={1.5} />
               </div>
               <div className="space-y-2">
                 <h2 className="text-4xl md:text-5xl font-bold text-primary tracking-tight">How can I help you?</h2>
@@ -101,7 +100,7 @@ export default function App() {
               >
                 Invoice Agent
               </button>
-              
+
               <button
                 onClick={() => {
                   setAgent('restaurant');
@@ -122,7 +121,7 @@ export default function App() {
               >
                 Banking Agent
               </button>
-              <button
+              {/* <button
                 onClick={() => {
                   setAgent('translation');
                   connect('translation');
@@ -131,7 +130,7 @@ export default function App() {
                 className="group relative w-full max-w-xs mx-auto py-4 px-8 bg-primary hover:bg-primary-hover text-white text-lg rounded-full font-semibold transition-all shadow-lg hover:shadow-primary/30 hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
               >
                 translation Agent
-              </button>
+              </button> */}
             </div>
 
             <div className="pt-8 flex justify-center gap-6 text-sm text-text-muted opacity-70">
