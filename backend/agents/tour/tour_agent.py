@@ -11,4 +11,4 @@ class TourAgent(Agent):
 
     @property
     def welcome_message(self):
-        return ("Johar! Welcome to the Land of Forests! I am VYOM, your official Jharkhand Tourism (JTDC) Concierge. We are thrilled to have you here!")
+        return ("Johar! Welcome to the Land of Forests! I am VYOM, your official Jharkhand Tourism (JTDC) Concierge.")
