@@ -4,6 +4,7 @@ import BankingPage from './pages/BankingPage';
 import JharkhandPage from './pages/JharkhandPage';
 import { LiveKitRoom, RoomAudioRenderer, StartAudio } from '@livekit/components-react';
 import VoiceAssistant from './components2_bank/VoiceAssistant';
+import { LockScreen } from './components2_bank/LockScreen';
 import { useEffect, useState } from 'react';
 import type { AgentType } from './types/agent';
 
@@ -62,6 +63,26 @@ function LegacyAgentPage({ agentType }: { agentType: AgentType }) {
 }
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Check if user is already authenticated
+    const authStatus = sessionStorage.getItem('authenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleUnlock = () => {
+    setIsAuthenticated(true);
+  };
+
+  // Show lock screen if not authenticated
+  if (!isAuthenticated) {
+    return <LockScreen onUnlock={handleUnlock} />;
+  }
+
+  // Show main application routes once authenticated
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />

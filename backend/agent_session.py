@@ -24,6 +24,7 @@ from livekit.plugins.openai.realtime import RealtimeModel
 from openai.types import realtime
 from livekit.plugins import openai
 from livekit.plugins import cartesia
+from livekit.plugins import gladia
 from openai.types.beta.realtime.session import TurnDetection
 import os
 import json
@@ -65,14 +66,13 @@ server = AgentServer(
 
 @server.rtc_session()
 async def my_agent(ctx: JobContext):
-  
 
     session = AgentSession(
+        
         llm=RealtimeModel(
             input_audio_transcription = realtime.AudioTranscription(
                     model="gpt-4o-transcribe",
-                    prompt="This is a coneversation between a customer and an agent." \
-                    "Whever you get Urdu transcribe to Hindi",
+                    prompt="This is a coneversation between a customer and an agent."
                 ),
             input_audio_noise_reduction = "near_field",
             turn_detection=TurnDetection(
@@ -92,8 +92,8 @@ async def my_agent(ctx: JobContext):
         #                  emotion="happy",
         #                  volume=1.2),
 
-        # turn_detection=MultilingualModel(),
-        # vad=silero.VAD.load(min_speech_duration=0.3, activation_threshold=0.7),
+        turn_detection=MultilingualModel(),
+        vad=silero.VAD.load(min_speech_duration=0.3, activation_threshold=0.7),
         preemptive_generation=False,
         use_tts_aligned_transcript=True,
     )
