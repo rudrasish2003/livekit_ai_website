@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { X, Phone, Globe, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, Phone, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import 'react-phone-number-input/style.css';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 
 interface OutboundCallModalProps {
     isOpen: boolean;
@@ -7,18 +9,8 @@ interface OutboundCallModalProps {
     agentType: string;
 }
 
-const COUNTRY_CODES = [
-    { code: '+1', country: 'US/CA', flag: '🇺🇸' },
-    { code: '+44', country: 'UK', flag: '🇬🇧' },
-    { code: '+91', country: 'IN', flag: '🇮🇳' },
-    { code: '+61', country: 'AU', flag: '🇦🇺' },
-    { code: '+81', country: 'JP', flag: '🇯🇵' },
-    { code: '+49', country: 'DE', flag: '🇩🇪' },
-];
-
 export function OutboundCallModal({ isOpen, onClose, agentType }: OutboundCallModalProps) {
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [countryCode, setCountryCode] = useState('+91');
+    const [phoneNumber, setPhoneNumber] = useState<string | undefined>();
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
@@ -26,7 +18,7 @@ export function OutboundCallModal({ isOpen, onClose, agentType }: OutboundCallMo
     if (!isOpen) return null;
 
     const handleCall = async () => {
-        if (!phoneNumber || phoneNumber.length < 5) {
+        if (!phoneNumber || !isValidPhoneNumber(phoneNumber)) {
             setErrorMessage('Please enter a valid phone number');
             setStatus('error');
             return;
@@ -37,7 +29,6 @@ export function OutboundCallModal({ isOpen, onClose, agentType }: OutboundCallMo
         setErrorMessage('');
 
         try {
-            const fullPhoneNumber = `${countryCode}${phoneNumber}`;
             const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
 
             const response = await fetch(`${BACKEND_URL}/api/makeCall`, {
@@ -46,7 +37,7 @@ export function OutboundCallModal({ isOpen, onClose, agentType }: OutboundCallMo
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    phone_number: fullPhoneNumber,
+                    phone_number: phoneNumber,
                     agent_type: agentType,
                 }),
             });
@@ -60,7 +51,7 @@ export function OutboundCallModal({ isOpen, onClose, agentType }: OutboundCallMo
             setTimeout(() => {
                 onClose();
                 setStatus('idle');
-                setPhoneNumber('');
+                setPhoneNumber(undefined);
             }, 2000);
 
         } catch (err: any) {
@@ -118,32 +109,40 @@ export function OutboundCallModal({ isOpen, onClose, agentType }: OutboundCallMo
                                 <label className="block text-sm font-medium text-gray-700 ml-1">
                                     Phone Number
                                 </label>
-                                <div className="flex gap-3">
-                                    <div className="relative w-1/3">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                            <Globe size={16} />
-                                        </div>
-                                        <select
-                                            value={countryCode}
-                                            onChange={(e) => setCountryCode(e.target.value)}
-                                            className="block w-full pl-9 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none outline-none cursor-pointer hover:bg-gray-100"
-                                        >
-                                            {COUNTRY_CODES.map((country) => (
-                                                <option key={country.code} value={country.code}>
-                                                    {country.flag} {country.code}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <input
-                                        type="tel"
+
+                                <div className="premium-phone-input">
+                                    <PhoneInput
+                                        international
+                                        defaultCountry="IN"
                                         value={phoneNumber}
-                                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                                        placeholder="98765 43210"
-                                        className="block w-2/3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                                        autoFocus
+                                        onChange={setPhoneNumber}
+                                        className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all"
+                                        numberInputProps={{
+                                            className: "w-full bg-transparent border-none outline-none text-gray-900 placeholder-gray-400 font-medium text-base",
+                                            placeholder: "Enter phone number"
+                                        }}
                                     />
                                 </div>
+                                <style>{`
+                                    .premium-phone-input .PhoneInputCountry {
+                                        margin-right: 8px;
+                                    }
+                                    .premium-phone-input .PhoneInputCountrySelect {
+                                        background: transparent;
+                                    }
+                                    .premium-phone-input .PhoneInputCountryIcon {
+                                        width: 24px;
+                                        height: 18px;
+                                        border-radius: 2px;
+                                        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                                    }
+                                    .premium-phone-input .PhoneInputCountryIcon--border {
+                                        background-color: transparent;
+                                        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                                        border: none;
+                                    }
+                                `}</style>
+
                                 <p className="text-xs text-gray-500 ml-1">
                                     Enter your number to receive a call from our AI agent.
                                 </p>
