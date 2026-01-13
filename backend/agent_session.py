@@ -23,7 +23,7 @@ from agents.tour.tour_agent import TourAgent
 from livekit.plugins.openai.realtime import RealtimeModel
 from openai.types import realtime
 # from livekit.plugins import openai
-from livekit.plugins import cartesia
+# from livekit.plugins import cartesia
 # from livekit.plugins import gladia
 from openai.types.beta.realtime.session import TurnDetection
 import os
@@ -104,7 +104,8 @@ async def my_agent(ctx: JobContext):
 
     # --- Background Audio Setup ---
     background_audio = BackgroundAudioPlayer(
-        ambient_sound=AudioConfig(BuiltinAudioClip.OFFICE_AMBIENCE, volume=1),
+        ambient_sound=[AudioConfig(BuiltinAudioClip.OFFICE_AMBIENCE, volume=1),
+                       AudioConfig(BuiltinAudioClip.CROWDED_ROOM, volume=1)],
         thinking_sound=[
             AudioConfig(BuiltinAudioClip.KEYBOARD_TYPING, volume=0.8),
             AudioConfig(BuiltinAudioClip.KEYBOARD_TYPING2, volume=0.7),
@@ -148,6 +149,10 @@ async def my_agent(ctx: JobContext):
     #asyncio.create_task(trigger_recording(ctx.room.name, agent_type))
     # asyncio.create_task(start_audio_recording2(ctx.room.name, agent_type))
 
+    # --- INITIATING SPEECH (Dynamically canged based on agent) ---
+    welcome_message = agent_instance.welcome_message
+    await session.say(text=welcome_message, allow_interruptions=True)
+
     # --- Background Audio Setup (in a separate task) --- 
     try:
         asyncio.create_task(background_audio.start(room=ctx.room, agent_session=session))
@@ -155,9 +160,7 @@ async def my_agent(ctx: JobContext):
     except Exception as e:
         logger.warning(f"Could not start background audio: {e}", exc_info=True)
         
-    # --- INITIATING SPEECH (Dynamically canged based on agent) ---
-    welcome_message = agent_instance.welcome_message
-    await session.say(text=welcome_message, allow_interruptions=True)
+    
 
 if __name__ == "__main__":
     cli.run_app(server)
