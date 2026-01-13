@@ -23,7 +23,7 @@ from agents.tour.tour_agent import TourAgent
 from livekit.plugins.openai.realtime import RealtimeModel
 from openai.types import realtime
 # from livekit.plugins import openai
-# from livekit.plugins import cartesia
+from livekit.plugins import cartesia
 # from livekit.plugins import gladia
 from openai.types.beta.realtime.session import TurnDetection
 import os
@@ -86,20 +86,19 @@ async def my_agent(ctx: JobContext):
         ),
         tts=inference.TTS(model="cartesia/sonic-3", 
                           voice="47f3bbb1-e98f-4e0c-92c5-5f0325e1e206",
-                          extra_kwargs={
-                                "volume": 1,
-                                "emotion": "excited"
-                            }), # Neha
+                          extra_kwargs={"volume": 1,}
+                            ), # Neha
 
         # tts=cartesia.TTS(model="sonic-3", 
-        #                  voice="209d9a43-03eb-40d8-a7b7-51a6d54c052f",
+        #                  voice="47f3bbb1-e98f-4e0c-92c5-5f0325e1e206",
         #                  api_key=os.getenv("CARTESIA_API_KEY"),
-        #                  emotion="happy",
-        #                  volume=1.2),
+        #                 #  emotion="happy",
+        #                 #  volume=1.2
+        #                  ),
 
         # turn_detection=MultilingualModel(),
         #vad=silero.VAD.load(min_speech_duration=0.3, activation_threshold=0.7),
-        preemptive_generation=False,
+        preemptive_generation=True,
         use_tts_aligned_transcript=True,
     )
 

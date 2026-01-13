@@ -7,7 +7,7 @@ import { useRoomContext, useLocalParticipant } from "@livekit/components-react";
 export interface ChatMessage {
   id: string;
   sender: 'user' | 'agent';
-  type: 'text' | 'flashcard'; 
+  type: 'text' | 'flashcard';
   text?: string;
   cardData?: {
     title: string;
@@ -34,7 +34,7 @@ export function useChatTranscriptions() {
           next.set(segment.id, {
             id: segment.id,
             type: 'text', // Explicitly set type
-            text: segment.text,
+            text: segment.text.replace(/<[^>]*>/g, '').trim(),
             sender: senderIsAgent ? "agent" : "user",
             isInterim: !segment.final,
             timestamp: segment.firstReceivedTime,
@@ -75,7 +75,7 @@ export function useChatTranscriptions() {
       } catch (e) {
         console.error(e);
       }
-    }, 
+    },
     []
   );
 
