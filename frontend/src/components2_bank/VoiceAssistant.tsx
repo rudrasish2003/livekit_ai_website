@@ -84,9 +84,9 @@ const VoiceAssistant: React.FC = () => {
       <div className="fixed bottom-8 left-0 right-0 flex justify-center z-50 pointer-events-none">
         <div
           className="
-            flex items-center gap-6 px-5 py-4 rounded-[32px] pointer-events-auto
-            bg-white/90 backdrop-blur-2xl 
-            border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)]
+            flex items-center gap-4 px-6 py-3 rounded-full pointer-events-auto
+            bg-white/95 backdrop-blur-2xl 
+            border border-slate-200/50 shadow-[0_30px_60px_rgba(0,0,0,0.12)]
             transition-all duration-500
           "
         >
@@ -94,30 +94,37 @@ const VoiceAssistant: React.FC = () => {
             type="button"
             onClick={toggleMic}
             className={`
-              relative w-14 h-14 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm
+              flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold text-sm
               ${isMicMuted
-                ? 'bg-zinc-100 text-zinc-400 hover:bg-zinc-200'
-                : 'bg-zinc-900 text-white hover:bg-zinc-800 hover:scale-105 hover:shadow-lg'}
+                ? 'bg-slate-100 text-slate-900 border border-slate-200 shadow-inner'
+                : 'bg-slate-900 text-white hover:bg-slate-800 shadow-lg hover:shadow-xl hover:-translate-y-0.5'}
             `}
           >
-            {isMicMuted ? <MicOff size={22} /> : <Mic size={22} />}
+            {isMicMuted ? <MicOff size={18} /> : <Mic size={18} />}
+            <span>{isMicMuted ? 'Unmute' : 'Mute'}</span>
           </button>
 
-          <div className="h-10 w-[1px] bg-zinc-200/60 mx-1" />
+          <div className="h-8 w-[1px] bg-slate-200 mx-1" />
 
           <VisualizerSection
             state={visualizerState}
             trackRef={activeTrack}
           />
 
-          <div className="h-10 w-[1px] bg-zinc-200/60 mx-1" />
+          <div className="h-8 w-[1px] bg-slate-200 mx-1" />
 
           <button
             type="button"
             onClick={handleDisconnect}
-            className="w-14 h-14 flex items-center justify-center rounded-full bg-rose-50 text-rose-500 hover:bg-rose-100 hover:scale-105 transition-all duration-300 shadow-sm hover:shadow-rose-100"
+            className="
+              flex items-center gap-2 px-5 py-3 rounded-full 
+              bg-rose-50 text-rose-600 border border-rose-100
+              hover:bg-rose-500 hover:text-white hover:border-rose-500 hover:shadow-lg hover:shadow-rose-500/30 hover:-translate-y-0.5
+              transition-all duration-300 font-semibold text-sm
+            "
           >
-            <PhoneOff size={22} />
+            <PhoneOff size={18} />
+            <span>End</span>
           </button>
 
         </div>

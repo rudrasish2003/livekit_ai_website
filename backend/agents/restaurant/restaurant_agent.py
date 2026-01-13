@@ -14,4 +14,4 @@ class RestaurantAgent(Agent):
 
     @property
     def welcome_message(self):
-        return ("Hi, This is VYOM, your restaurant reservation calling agent. How can I help you today?")
+        return ("<emotion value='excited' />Hi, This is VYOM, your restaurant reservation calling agent. How can I help you today?")

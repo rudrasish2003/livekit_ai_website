@@ -5,6 +5,7 @@ import { AlertCircle, Mic } from 'lucide-react';
 import type { AgentType } from '../types/agent';
 import { AgentButton } from '../components2_bank/AgentButton';
 import { OutboundCallModal } from '../components2_bank/OutboundCallModal';
+import { AgentInteractionModal } from '../components2_bank/AgentInteractionModal';
 
 // Safely access environment variables with fallback
 const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
@@ -15,6 +16,7 @@ export default function HomePage() {
     const [connecting, setConnecting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [outboundModalOpen, setOutboundModalOpen] = useState(false);
+    const [interactionModalOpen, setInteractionModalOpen] = useState(false);
     const [selectedAgent, setSelectedAgent] = useState<AgentType>('web');
 
     const connect = async (chosenAgent: AgentType) => {
@@ -75,6 +77,11 @@ export default function HomePage() {
         setOutboundModalOpen(true);
     };
 
+    const handleMobileClick = (agent: AgentType) => {
+        setSelectedAgent(agent);
+        setInteractionModalOpen(true);
+    };
+
     return (
         <div className="flex flex-col min-h-screen bg-background text-text-main font-sans selection:bg-primary/20">
             <Header status="disconnected" />
@@ -110,6 +117,7 @@ export default function HomePage() {
                             agentType="web"
                             onWebCall={handleWebCall}
                             onOutboundCall={handleOutboundCall}
+                            onMobileClick={handleMobileClick}
                             disabled={connecting}
                         />
 
@@ -118,6 +126,7 @@ export default function HomePage() {
                             agentType="invoice"
                             onWebCall={handleWebCall}
                             onOutboundCall={handleOutboundCall}
+                            onMobileClick={handleMobileClick}
                             disabled={connecting}
                         />
 
@@ -126,6 +135,7 @@ export default function HomePage() {
                             agentType="restaurant"
                             onWebCall={handleWebCall}
                             onOutboundCall={handleOutboundCall}
+                            onMobileClick={handleMobileClick}
                             disabled={connecting}
                         />
 
@@ -134,6 +144,7 @@ export default function HomePage() {
                             agentType="bank"
                             onWebCall={handleWebCall}
                             onOutboundCall={handleOutboundCall}
+                            onMobileClick={handleMobileClick}
                             disabled={connecting}
                         />
 
@@ -142,6 +153,7 @@ export default function HomePage() {
                             agentType="tour"
                             onWebCall={handleWebCall}
                             onOutboundCall={handleOutboundCall}
+                            onMobileClick={handleMobileClick}
                             disabled={connecting}
                         />
                     </div>
@@ -159,6 +171,14 @@ export default function HomePage() {
                 isOpen={outboundModalOpen}
                 onClose={() => setOutboundModalOpen(false)}
                 agentType={selectedAgent}
+            />
+
+            <AgentInteractionModal
+                isOpen={interactionModalOpen}
+                onClose={() => setInteractionModalOpen(false)}
+                agentType={selectedAgent}
+                onWebCall={handleWebCall}
+                onOutboundCall={handleOutboundCall}
             />
         </div>
     );

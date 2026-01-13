@@ -115,27 +115,47 @@ export const AgentCardUI: React.FC<AgentCardUIProps> = ({
             {/* Footer Actions */}
             <div className="w-full">
                 {state === 'active' ? (
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-3 w-full">
+                        {/* Mute Button */}
                         <button
                             onClick={onToggleMic}
-                            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${!isMicMuted ? 'bg-[#D4AF37] text-[#0B1426]' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}
+                            className={`
+                                flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300
+                                ${isMicMuted
+                                    ? 'bg-white text-[#0B1426] shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-[1.02]'
+                                    : 'bg-white/5 hover:bg-white/10 text-slate-200 border border-white/5 hover:border-white/10'}
+                            `}
                         >
-                            {isMicMuted ? <><MicOff size={14} /> Muted</> : <><Mic size={14} /> Mute Mic</>}
-                        </button>
-                        <button
-                            onClick={onDisconnect}
-                            className="w-10 flex items-center justify-center rounded-xl bg-slate-700/50 text-slate-400 hover:bg-rose-500 hover:text-white transition-colors"
-                        >
-                            <PhoneOff size={16} />
+                            {isMicMuted ? <MicOff size={18} /> : <Mic size={18} />}
+                            <span>{isMicMuted ? 'Unmute' : 'Mute'}</span>
                         </button>
 
-                        {/* Chat Toggle Button */}
+                        {/* Disconnect Button */}
+                        <button
+                            onClick={onDisconnect}
+                            className="
+                                flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold 
+                                bg-gradient-to-br from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 text-white 
+                                shadow-[0_4px_16px_rgba(239,68,68,0.3)] 
+                                transition-all duration-300 hover:scale-[1.02] active:scale-95 border border-red-400/20
+                            "
+                        >
+                            <PhoneOff size={18} />
+                            <span>End</span>
+                        </button>
+
+                        {/* Chat Toggle */}
                         {onToggleChat && (
                             <button
                                 onClick={onToggleChat}
-                                className={`w-10 flex items-center justify-center rounded-xl transition-colors ${showChat ? 'bg-[#D4AF37] text-[#0B1426]' : 'bg-slate-700/50 text-slate-400 hover:text-white'}`}
+                                className={`
+                                    w-12 h-12 flex-none flex items-center justify-center rounded-2xl transition-all duration-300
+                                    ${showChat
+                                        ? 'bg-[#D4AF37] text-[#0B1426] shadow-[0_0_15px_rgba(212,175,55,0.3)]'
+                                        : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/5'}
+                                `}
                             >
-                                {showChat ? <ChevronDown size={20} /> : <MessageSquare size={16} />}
+                                {showChat ? <ChevronDown size={22} /> : <MessageSquare size={20} />}
                             </button>
                         )}
                     </div>
@@ -143,15 +163,17 @@ export const AgentCardUI: React.FC<AgentCardUIProps> = ({
                     <button
                         onClick={onConnect}
                         disabled={state === 'connecting'}
-                        className="w-full py-3 rounded-xl bg-[#D4AF37] text-[#0B1426] text-sm font-bold shadow-lg shadow-[#D4AF37]/20 hover:bg-[#bfa03a] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:pointer-events-none"
+                        className="w-full py-4 rounded-2xl bg-[#D4AF37] text-[#0B1426] text-sm font-bold shadow-lg shadow-[#D4AF37]/20 hover:bg-[#bfa03a] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:pointer-events-none"
                     >
                         {state === 'connecting' ? (
                             <>
-                                <Loader2 size={16} className="animate-spin" /> Connecting...
+                                <Loader2 size={18} className="animate-spin" />
+                                <span>Connecting...</span>
                             </>
                         ) : (
                             <>
-                                <Mic size={16} /> Connect with Agent
+                                <Mic size={18} />
+                                <span>Start Conversation</span>
                             </>
                         )}
                     </button>

@@ -79,33 +79,33 @@ async def my_agent(ctx: JobContext):
                 eagerness="auto",
                 create_response=True,
                 interrupt_response=True,
-                idle_timeout_ms=30000
+                threshold=0.7
             ),
             modalities = ['text'],
             api_key=os.getenv("OPENAI_API_KEY")
         ),
         tts=inference.TTS(model="cartesia/sonic-3", 
                           voice="47f3bbb1-e98f-4e0c-92c5-5f0325e1e206",
-                          extra_kwargs={
-                                "volume": 1,
-                                "emotion": "excited"
-                            }), # Neha
+                          extra_kwargs={"volume": 1,}
+                            ), # Neha
 
         # tts=cartesia.TTS(model="sonic-3", 
-        #                  voice="209d9a43-03eb-40d8-a7b7-51a6d54c052f",
+        #                  voice="47f3bbb1-e98f-4e0c-92c5-5f0325e1e206",
         #                  api_key=os.getenv("CARTESIA_API_KEY"),
-        #                  emotion="happy",
-        #                  volume=1.2),
+        #                 #  emotion="happy",
+        #                 #  volume=1.2
+        #                  ),
 
-        turn_detection=MultilingualModel(),
-        vad=silero.VAD.load(min_speech_duration=0.3, activation_threshold=0.7),
-        preemptive_generation=False,
+        # turn_detection=MultilingualModel(),
+        #vad=silero.VAD.load(min_speech_duration=0.3, activation_threshold=0.7),
+        preemptive_generation=True,
         use_tts_aligned_transcript=True,
     )
 
     # --- Background Audio Setup ---
     background_audio = BackgroundAudioPlayer(
-        ambient_sound=AudioConfig(BuiltinAudioClip.OFFICE_AMBIENCE, volume=0.8),
+        ambient_sound=[AudioConfig(BuiltinAudioClip.OFFICE_AMBIENCE, volume=1),
+                       AudioConfig(BuiltinAudioClip.CROWDED_ROOM, volume=1)],
         thinking_sound=[
             AudioConfig(BuiltinAudioClip.KEYBOARD_TYPING, volume=0.8),
             AudioConfig(BuiltinAudioClip.KEYBOARD_TYPING2, volume=0.7),
@@ -149,6 +149,10 @@ async def my_agent(ctx: JobContext):
     #asyncio.create_task(trigger_recording(ctx.room.name, agent_type))
     # asyncio.create_task(start_audio_recording2(ctx.room.name, agent_type))
 
+    # --- INITIATING SPEECH (Dynamically canged based on agent) ---
+    welcome_message = agent_instance.welcome_message
+    await session.say(text=welcome_message, allow_interruptions=True)
+
     # --- Background Audio Setup (in a separate task) --- 
     try:
         asyncio.create_task(background_audio.start(room=ctx.room, agent_session=session))
@@ -156,9 +160,7 @@ async def my_agent(ctx: JobContext):
     except Exception as e:
         logger.warning(f"Could not start background audio: {e}", exc_info=True)
         
-    # --- INITIATING SPEECH (Dynamically canged based on agent) ---
-    welcome_message = agent_instance.welcome_message
-    await session.say(text=welcome_message, allow_interruptions=True)
+    
 
 if __name__ == "__main__":
     cli.run_app(server)
