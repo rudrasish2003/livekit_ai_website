@@ -158,7 +158,7 @@ async def my_agent(ctx: JobContext):
         
     # --- INITIATING SPEECH (Dynamically canged based on agent) ---
     welcome_message = agent_instance.welcome_message
-    await session.say(text=welcome_message, allow_interruptions=False)
+    await session.say(text=welcome_message, allow_interruptions=True)
 
 if __name__ == "__main__":
     cli.run_app(server)
