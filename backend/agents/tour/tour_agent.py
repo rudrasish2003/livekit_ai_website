@@ -11,4 +11,4 @@ class TourAgent(Agent):
 
     @property
     def welcome_message(self):
-        return ("<emotion value='excited' />Johar! Welcome to the Land of Forests! I am VYOM, your official Jharkhand Tourism (JTDC) Concierge.")
+        return ("<emotion value='content' />Johar! Welcome to the Land of Forests! I am VYOM, your official Jharkhand Tourism (JTDC) Concierge.")

@@ -24,7 +24,7 @@ class Webagent(Agent):
     @property
     def welcome_message(self):
         return (
-            "<emotion value='excited' />Welcome to Indus Net Technologies."
+            "<emotion value='content' />Welcome to Indus Net Technologies."
             "I’m Aarti, your web assistant. How can I help you today?"
         )
 

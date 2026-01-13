@@ -71,7 +71,7 @@ async def my_agent(ctx: JobContext):
         llm=RealtimeModel(
             input_audio_transcription = realtime.AudioTranscription(
                     model="gpt-4o-transcribe",
-                    prompt="This is a conversation between a customer and an agent."
+                    prompt="This is a multilingual conversation between a customer and an agent. Transcribe accurately in the language being spoken."
                 ),
             input_audio_noise_reduction = "near_field",
             turn_detection=TurnDetection(
@@ -79,14 +79,14 @@ async def my_agent(ctx: JobContext):
                 eagerness="auto",
                 create_response=True,
                 interrupt_response=True,
-                threshold=0.7
+                threshold=0.5
             ),
             modalities = ['text'],
             api_key=os.getenv("OPENAI_API_KEY")
         ),
         tts=inference.TTS(model="cartesia/sonic-3", 
                           voice="47f3bbb1-e98f-4e0c-92c5-5f0325e1e206",
-                          extra_kwargs={"volume": 1,}
+                          #extra_kwargs={"volume": 0.8}
                             ), # Neha
 
         # tts=cartesia.TTS(model="sonic-3", 
