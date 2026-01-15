@@ -81,11 +81,12 @@ async def my_agent(ctx: JobContext):
                 ),
             input_audio_noise_reduction = "near_field",
             turn_detection=TurnDetection(
-                type="semantic_vad",
-                eagerness="low",
+                type="server_vad",
+                threshold=0.5,
+                prefix_padding_ms=300,
+                silence_duration_ms=500,
                 create_response=True,
                 interrupt_response=True,
-                threshold=0.5
             ),
             modalities = ['text'],
             api_key=os.getenv("OPENAI_API_KEY")
