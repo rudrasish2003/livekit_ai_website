@@ -72,7 +72,7 @@ async def my_agent(ctx: JobContext):
     session = AgentSession(
         llm=RealtimeModel(
             input_audio_transcription = realtime.AudioTranscription(
-                    model="gpt-4o-transcribe",
+                    model="gpt-4o-mini-transcribe",
                     prompt=(
                         "The speaker is multilingual and switches between different languages dynamically. "
                         "Do not force any specific language for transcription. "
@@ -91,7 +91,10 @@ async def my_agent(ctx: JobContext):
         ),
         tts=inference.TTS(model="cartesia/sonic-3", 
                           voice="47f3bbb1-e98f-4e0c-92c5-5f0325e1e206",
-                          extra_kwargs={"speed": 1.0}
+                          extra_kwargs={
+                              "speed": "normal",
+                              "language": "mix"
+                              }
                             ), # Neha
 
         # tts=cartesia.TTS(model="sonic-3", 
