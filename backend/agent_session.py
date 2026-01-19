@@ -91,7 +91,7 @@ async def my_agent(ctx: JobContext):
         ),
         tts=inference.TTS(model="cartesia/sonic-3", 
                           voice="47f3bbb1-e98f-4e0c-92c5-5f0325e1e206",
-                          #extra_kwargs={"volume": 0.8}
+                          extra_kwargs={"speed": 1.0}
                             ), # Neha
 
         # tts=cartesia.TTS(model="sonic-3", 
@@ -99,6 +99,7 @@ async def my_agent(ctx: JobContext):
         #                  api_key=os.getenv("CARTESIA_API_KEY"),
         #                 #  emotion="happy",
         #                 #  volume=1.2
+        #                 speed=1.0
         #                  ),
 
         # turn_detection=MultilingualModel(),
