@@ -22,12 +22,12 @@ def _save_config(config):
     except Exception as e:
         logger.error(f"Error saving inbound config: {e}")
 
+# Get the mapped number
 def get_agent_for_number(phone_number: str) -> str:
     config = _load_config()
-    # Normalize phone number if needed (e.g. remove spaces, ensure format)
-    # For now assuming exact match or simple key lookup
     return config.get(phone_number)
 
+# Set the mapped number to agent
 def set_agent_for_number(phone_number: str, agent_type: str):
     config = _load_config()
     config[phone_number] = agent_type

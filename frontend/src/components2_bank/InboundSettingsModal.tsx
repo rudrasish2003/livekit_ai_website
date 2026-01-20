@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Save, Loader2, CheckCircle2, AlertCircle, Settings } from 'lucide-react';
 import 'react-phone-number-input/style.css';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
@@ -21,8 +21,42 @@ export function InboundSettingsModal({ isOpen, onClose }: InboundSettingsModalPr
     const [phoneNumber, setPhoneNumber] = useState<string | undefined>();
     const [selectedAgent, setSelectedAgent] = useState('web');
     const [isLoading, setIsLoading] = useState(false);
+    const [fetching, setFetching] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
+
+    // Load from local storage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem('inbound_phone_number');
+        if (saved) {
+            setPhoneNumber(saved);
+        }
+    }, []);
+
+    // Fetch mapping when modal opens or phone number is restored
+    useEffect(() => {
+        if (isOpen && phoneNumber && isValidPhoneNumber(phoneNumber)) {
+            fetchMapping(phoneNumber);
+        }
+    }, [isOpen]);
+
+    const fetchMapping = async (phone: string) => {
+        setFetching(true);
+        try {
+            const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
+            const res = await fetch(`${BACKEND_URL}/api/getInboundAgent?phone_number=${encodeURIComponent(phone)}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.agent_type) {
+                    setSelectedAgent(data.agent_type);
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch mapping", e);
+        } finally {
+            setFetching(false);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -36,6 +70,9 @@ export function InboundSettingsModal({ isOpen, onClose }: InboundSettingsModalPr
         setIsLoading(true);
         setStatus('idle');
         setErrorMessage('');
+
+        // Save to local storage
+        localStorage.setItem('inbound_phone_number', phoneNumber);
 
         try {
             const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
@@ -118,18 +155,28 @@ export function InboundSettingsModal({ isOpen, onClose }: InboundSettingsModalPr
                                     <label className="block text-sm font-medium text-gray-700 ml-1 mb-1">
                                         Your Phone Number
                                     </label>
-                                    <div className="premium-phone-input">
+                                    <div className="premium-phone-input relative">
                                         <PhoneInput
                                             international
                                             defaultCountry="IN"
                                             value={phoneNumber}
                                             onChange={setPhoneNumber}
+                                            onBlur={() => {
+                                                if (phoneNumber && isValidPhoneNumber(phoneNumber)) {
+                                                    fetchMapping(phoneNumber);
+                                                }
+                                            }}
                                             className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all"
                                             numberInputProps={{
                                                 className: "w-full bg-transparent border-none outline-none text-gray-900 placeholder-gray-400 font-medium text-base",
                                                 placeholder: "Enter phone number"
                                             }}
                                         />
+                                        {fetching && (
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                <Loader2 size={16} className="animate-spin text-gray-400" />
+                                            </div>
+                                        )}
                                     </div>
                                     <style>{`
                                         .premium-phone-input .PhoneInputCountry {

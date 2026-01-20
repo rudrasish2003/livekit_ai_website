@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 # Import the outbound call function
 from outbound.outbound_call import make_call
-from inbound.config_manager import set_agent_for_number
+from inbound.config_manager import set_agent_for_number, get_agent_for_number
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -133,6 +133,11 @@ async def set_inbound_agent(request: InboundAgentRequest):
     
     set_agent_for_number(request.phone_number, request.agent_type)
     return JSONResponse(content={"status": "success", "message": f"Linked {request.phone_number} to agent {request.agent_type}"})
+
+@app.get("/api/getInboundAgent")
+async def get_inbound_agent(phone_number: str = Query(...)):
+    mapped_agent = get_agent_for_number(phone_number)
+    return JSONResponse(content={"phone_number": phone_number, "agent_type": mapped_agent})
 
 @app.get("/health", response_class=PlainTextResponse)
 async def health():

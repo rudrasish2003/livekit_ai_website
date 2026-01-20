@@ -154,18 +154,10 @@ async def my_agent(ctx: JobContext):
     # Determine agent type based on room metadata or fallback to "web"
     agent_type = "web"
     
-    # Check if SIP call and override if mapping exists
+    # Check if SIP call and override if mapping exists (Inbound calls)
     if participant.kind == rtc.ParticipantKind.PARTICIPANT_KIND_SIP:
-        # participant.identity is usually "sip:+1234567890@..."
-        # We try to extract the phone number.
-        # Identity might be just the phone number depending on SIP trunk config.
-        logger.info(f"Participant identity: {participant.identity}")
-        phone_number = participant.identity
-        if phone_number.startswith("sip:"):
-            phone_number = phone_number[4:]
-        # Remove anything after @ if present
-        if "@" in phone_number:
-            phone_number = phone_number.split("@")[0]
+        logger.info(f"Participant identity: {participant.identity}") # Comes like "sip_+1234567890"
+        phone_number = participant.identity.split("_")[1]
             
         logger.info(f"SIP Call detected from {phone_number}")
         mapped_agent = get_agent_for_number(phone_number)
