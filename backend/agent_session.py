@@ -154,16 +154,21 @@ async def my_agent(ctx: JobContext):
     # Determine agent type based on room metadata or fallback to "web"
     agent_type = "web"
     
+    
     # Check if SIP call and override if mapping exists (Inbound calls)
     if participant.kind == rtc.ParticipantKind.PARTICIPANT_KIND_SIP:
-        logger.info(f"Participant identity: {participant.identity}") # Comes like "sip_+1234567890"
-        phone_number = participant.identity.split("_")[1]
-            
-        logger.info(f"SIP Call detected from {phone_number}")
-        mapped_agent = get_agent_for_number(phone_number)
+        called_number =  participant.attributes.get("sip.trunkPhoneNumber")
+        logger.info(f"Called number: {called_number}")
+
+        # logger.info(f"Participant identity: {participant.identity}") # Comes like "sip_+1234567890"
+        # phone_number = participant.identity.split("_")[1]
+        # logger.info(f"SIP Call detected from {phone_number}")
+
+        mapped_agent = get_agent_for_number(called_number)
+        logger.info(f"Mapped agent: {mapped_agent}")
         if mapped_agent:
             agent_type = mapped_agent
-            logger.info(f"Using mapped agent {agent_type} for {phone_number}")
+            logger.info(f"Using mapped agent {agent_type} for {called_number}")
 
     # If NOT SIP or no mapping found, fall back to metadata
     if agent_type == "web" and participant.metadata:
