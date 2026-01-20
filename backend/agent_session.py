@@ -30,6 +30,7 @@ from openai.types.beta.realtime.session import TurnDetection
 import os
 import json
 import asyncio
+from inbound.config_manager import get_agent_for_number
 
 # Recording input
 # from recording.recording import start_audio_recording, record_participant_audio, start_audio_recording2
@@ -152,7 +153,28 @@ async def my_agent(ctx: JobContext):
 
     # Determine agent type based on room metadata or fallback to "web"
     agent_type = "web"
-    if participant.metadata:
+    
+    # Check if SIP call and override if mapping exists
+    if participant.kind == rtc.ParticipantKind.PARTICIPANT_KIND_SIP:
+        # participant.identity is usually "sip:+1234567890@..."
+        # We try to extract the phone number.
+        # Identity might be just the phone number depending on SIP trunk config.
+        logger.info(f"Participant identity: {participant.identity}")
+        phone_number = participant.identity
+        if phone_number.startswith("sip:"):
+            phone_number = phone_number[4:]
+        # Remove anything after @ if present
+        if "@" in phone_number:
+            phone_number = phone_number.split("@")[0]
+            
+        logger.info(f"SIP Call detected from {phone_number}")
+        mapped_agent = get_agent_for_number(phone_number)
+        if mapped_agent:
+            agent_type = mapped_agent
+            logger.info(f"Using mapped agent {agent_type} for {phone_number}")
+
+    # If NOT SIP or no mapping found, fall back to metadata
+    if agent_type == "web" and participant.metadata:
         try:
             agent_type = json.loads(participant.metadata).get("agent", "web")
         except Exception:

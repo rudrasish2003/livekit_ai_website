@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 # Import the outbound call function
 from outbound.outbound_call import make_call
+from inbound.config_manager import set_agent_for_number
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -118,6 +119,20 @@ async def trigger_outbound_call(request: OutboundCallRequest):
     except Exception as e:
         logger.error(f"Failed to initiate outbound call: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+class InboundAgentRequest(BaseModel):
+    phone_number: str
+    agent_type: str
+
+@app.post("/api/setInboundAgent")
+async def set_inbound_agent(request: InboundAgentRequest):
+    logger.info(f"Received inbound agent set request: {request}")
+    
+    if request.agent_type not in ALLOWED_AGENTS:
+        raise HTTPException(status_code=400, detail=f"Invalid agent type: {request.agent_type}. Allowed: {ALLOWED_AGENTS}")
+    
+    set_agent_for_number(request.phone_number, request.agent_type)
+    return JSONResponse(content={"status": "success", "message": f"Linked {request.phone_number} to agent {request.agent_type}"})
 
 @app.get("/health", response_class=PlainTextResponse)
 async def health():
