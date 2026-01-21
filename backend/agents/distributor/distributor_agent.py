@@ -16,5 +16,5 @@ class DistributorAgent(Agent):
     @property
     def welcome_message(self):
         # welcome_message = f"<emotion value='content' />“Hello sir, good day. May I speak with Avi please?”"
-        welcome_message = '<emotion value="warm"/> Namaste, this is Vilok from Aryan Veda. <break time="300ms"/> <emotion value="respectful"/> Am I speaking with Suresh Agarwal?'
+        welcome_message = '<emotion value="warm"/> नमस्ते, this is Vilok from आर्य वेद. <break time="300ms"/> Am I speaking with सुरेश अग्रवाल?'
         return welcome_message
