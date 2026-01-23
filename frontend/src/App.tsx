@@ -63,6 +63,8 @@ function LegacyAgentPage({ agentType }: { agentType: AgentType }) {
   );
 }
 
+import BandhanBankingPage from './pages/BandhanBankingPage';
+
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
@@ -94,7 +96,7 @@ export default function App() {
       <Route path="/restaurant" element={<LegacyAgentPage agentType="restaurant" />} />
       <Route path="/realestate" element={<LegacyAgentPage agentType="realestate" />} />
       <Route path="/distributor" element={<LegacyAgentPage agentType="distributor" />} />
-      <Route path="/bandhan_banking" element={<LegacyAgentPage agentType="bandhan_banking" />} />
+      <Route path="/bandhan_banking" element={<BandhanBankingPage />} />
     </Routes>
   );
 }

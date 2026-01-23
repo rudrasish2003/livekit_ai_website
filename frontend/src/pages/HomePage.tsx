@@ -65,11 +65,13 @@ export default function HomePage() {
     };
 
     const handleWebCall = (agent: AgentType) => {
-        // preserve original behavior: navigate for bank/tour, connect for others
+        // preserve original behavior: navigate for bank/tour/bandhan_banking, connect for others
         if (agent === 'bank') {
             navigate('/bank');
         } else if (agent === 'tour') {
             navigate('/jharkhand');
+        } else if (agent === 'bandhan_banking') {
+            navigate('/bandhan_banking');
         } else {
             connect(agent);
         }
@@ -175,7 +177,7 @@ export default function HomePage() {
                             onMobileClick={handleMobileClick}
                             disabled={connecting}
                         />
-                    
+
                         <AgentButton
                             label="Distributor Agent"
                             agentType="distributor"
@@ -184,7 +186,7 @@ export default function HomePage() {
                             onMobileClick={handleMobileClick}
                             disabled={connecting}
                         />
-                        
+
                         <AgentButton
                             label="Bandhan Bank Agent"
                             agentType="bandhan_banking"
@@ -209,7 +211,7 @@ export default function HomePage() {
                 onClose={() => setOutboundModalOpen(false)}
                 agentType={selectedAgent}
             />
-            
+
             <AgentInteractionModal
                 isOpen={interactionModalOpen}
                 onClose={() => setInteractionModalOpen(false)}
