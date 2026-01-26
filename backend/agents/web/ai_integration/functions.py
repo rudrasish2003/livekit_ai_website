@@ -20,16 +20,28 @@ class UIAgentFunctions:
         self, user_input: str, db_results: str, ui_context: dict
     ) -> AsyncGenerator[dict[str, Any], None]:
         try:
-
             self.logger.info("Starting UI stream generation with user input: %s", user_input)
-
+            
+            # Format UI context as clear, structured JSON for the LLM
+            ui_context_str = json.dumps(ui_context, indent=2) if ui_context else "{}"
+            
             with self.openai_client.responses.stream(
                 model=self.llm_model,
                 input=[
                     {"role": "system", "content": SYSTEM_INSTRUCTION},
                     {
                         "role": "user",
-                        "content": f"DB Results:\n[\n{db_results}\n]\n\nUser query: {user_input} \n\nUI Context:\n{ui_context}\n\nAnswer:",
+                        "content": f"""## Database Results
+                        {db_results}
+
+                        ## User Query
+                        {user_input}
+
+                        ## Current UI Context (elements already visible to user)
+                        {ui_context_str}
+
+                        ## Your Task
+                        Generate flashcards for NEW information only. Check active_elements above and skip any content already displayed.""",
                     },
                 ],
                 text_format=UIStreamResponse,
@@ -107,7 +119,10 @@ class UIAgentFunctions:
             return None
 
         payload: dict[str, Any] = {"type": "flashcard"}
+        
+        # Include id for deduplication tracking
         for key in (
+            "id",
             "title",
             "value",
             "accentColor",

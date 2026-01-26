@@ -9,6 +9,7 @@ class FlashcardImage(BaseModel):
 
 class Flashcard(BaseModel):
     type: str | None = None
+    id: str | None = None  # Stable ID for deduplication
     title: str
     value: str
     accentColor: str | None = None

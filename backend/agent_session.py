@@ -178,7 +178,7 @@ async def my_agent(ctx: JobContext):
     # Attach the agent to the session
     session.update_agent(agent=agent_instance)
 
-    # Frontend details for the WEB agent
+    # Frontend details for the WEB agent - UI Context Sync
     @ctx.room.on("data_received")
     def _handle_data_received(data: rtc.DataPacket):
         topic = getattr(data, "topic", None)
@@ -189,19 +189,28 @@ async def my_agent(ctx: JobContext):
             payload_text = payload.decode("utf-8", errors="ignore")
         else:
             payload_text = str(payload) if payload is not None else ""
-        logger.info(
-            "Received ui.context payload (len=%s): %s",
-            len(payload_text),
-            payload_text,
-        )
+        
         if not hasattr(agent_instance, "update_ui_context"):
+            logger.debug("Agent does not support UI context sync")
             return
+        
         try:
             context_payload = json.loads(payload_text)
         except json.JSONDecodeError:
-            logger.warning("Invalid ui.context payload")
+            logger.warning("Invalid ui.context payload - JSON parse failed")
             return
-        logger.info("Parsed ui.context: %s", context_payload)
+        
+        # Enhanced logging for debugging
+        msg_type = context_payload.get("type", "unknown")
+        viewport = context_payload.get("viewport", {})
+        active_elements = context_payload.get("active_elements", [])
+        logger.info(
+            "📱 UI Context Sync: type=%s, screen=%s, active_elements=%d",
+            msg_type,
+            viewport.get("screen", "unknown"),
+            len(active_elements),
+        )
+        
         agent_instance.update_ui_context(context_payload)
 
     # Start recording in a separate task
