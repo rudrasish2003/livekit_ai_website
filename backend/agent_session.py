@@ -12,7 +12,7 @@ from livekit.agents import (
     AudioConfig,
 )
 from livekit.plugins import noise_cancellation
-from agents.web.web_agent2 import Webagent
+from agents.web.web_agent import Webagent
 from agents.invoice.invoice_agent import InvoiceAgent
 from agents.restaurant.restaurant_agent import RestaurantAgent
 from agents.banking.banking_agent import BankingAgent
@@ -21,6 +21,7 @@ from agents.realestate.realestate_agent import RealestateAgent
 from agents.distributor.distributor_agent import DistributorAgent
 from agents.bandhan_banking.bandhan_banking import BandhanBankingAgent
 from openai.types.beta.realtime.session import TurnDetection
+# from livekit.plugins import cartesia
 from livekit.plugins.openai import realtime
 from openai.types.realtime import AudioTranscription
 import os
@@ -89,6 +90,7 @@ async def my_agent(ctx: JobContext):
             modalities=["text"],
             api_key=cast(str, os.getenv("OPENAI_API_KEY")),
         ),
+        # tts=cartesia.TTS(model="sonic-3", voice="209d9a43-03eb-40d8-a7b7-51a6d54c052f", api_key=os.getenv("CARTESIA_API_KEY")),
         tts=ElevenLabsNonStreamingTTS(
             voice_id="kL8yauEAuyf6botQt9wa",  # Monika - Indian Female
             model="eleven_v3",
