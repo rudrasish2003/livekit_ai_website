@@ -7,14 +7,14 @@ import asyncio
 import uuid
 from agents.web.ai_integration.functions import UIAgentFunctions
 from agents.web.web_agent_prompt import WEB_AGENT_PROMPT
-from shared_humanization_prompt.tts_humanification_cartesia import TTS_HUMANIFICATION_CARTECIA
+from shared_humanization_prompt.tts_humanification_cartesia import TTS_HUMANIFICATION_CARTESIA
 
 logger = logging.getLogger(__name__)
 
 
 class Webagent(Agent):
     def __init__(self, room) -> None:
-        self._base_instruction = WEB_AGENT_PROMPT + TTS_HUMANIFICATION_CARTECIA
+        self._base_instruction = WEB_AGENT_PROMPT + TTS_HUMANIFICATION_CARTESIA
         super().__init__(
             # Instructions for the agent (will be updated dynamically with UI context)
             instructions=self._base_instruction,
