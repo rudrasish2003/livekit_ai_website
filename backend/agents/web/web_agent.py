@@ -41,7 +41,6 @@ class Webagent(Agent):
     async def search_indus_net_knowledge_base(self, context: RunContext, question: str):
         """
         Search the official Indus Net Knowledge Base for information about the company. 
-        Calling this tool will also trigger a visual update on the user interface.
         """
         logger.info(f"Searching knowledge base for: {question}")
         
@@ -59,19 +58,28 @@ class Webagent(Agent):
             if line.strip() and (i == 0 or line.strip() != joined.splitlines()[i-1].strip())
         )
 
-        # 3. Trigger UI Stream (Visual Presenter Logic)
-        # This runs in the background to ensure the voice response isn't delayed
-        asyncio.create_task(
-            asyncio.to_thread(
-                lambda: asyncio.run(self._publish_ui_stream(question, cleaned))
-            )
-        )
-        
-        # 4. Return data to the LLM to narrate
         return cleaned
 
     # Publish UI Stream to frontend
-    async def _publish_ui_stream(self, user_input: str, db_results: str) -> None:
+    @function_tool
+    async def publish_ui_stream(self, context: RunContext, user_input: str, db_results: str, agent_response: str) -> None:
+        """
+        Publish the UI stream to the frontend.
+        Call this tool AFTER searching the knowledge base.
+        Pass the 'db_results' you got from the search tool, the original 'user_input', and your formulated 'agent_response'.
+        This will generate and display flashcards on the user's screen.
+        """
+        logger.info(f"Publishing UI stream for: {user_input}")
+        
+        # This runs in the background to ensure the voice response isn't delayed
+        asyncio.create_task(
+            asyncio.to_thread(
+                lambda: asyncio.run(self._publish_ui_stream(user_input, db_results, agent_response))
+            )
+        )
+        return "UI stream published."
+
+    async def _publish_ui_stream(self, user_input: str, db_results: str, agent_response: str) -> None:
         """Generate and publish UI cards, filtering out already-visible content."""
         
         # Generate a unique stream ID for this specific generation batch
@@ -79,7 +87,7 @@ class Webagent(Agent):
         card_index = 0
         
         async for payload in self.ui_agent_functions.query_process_stream(
-            user_input=user_input, db_results=db_results
+            user_input=user_input, db_results=db_results, agent_response=agent_response
         ):
             # Check for redundancy before publishing
             title = payload.get("title", "")

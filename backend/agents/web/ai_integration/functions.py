@@ -18,25 +18,35 @@ class UIAgentFunctions:
         self.instructions = SYSTEM_INSTRUCTION
 
     async def query_process_stream(
-        self, user_input: str, db_results: str
+        self, user_input: str, db_results: str, agent_response: str | None = None
     ) -> AsyncGenerator[dict[str, Any], None]:
         try:
             self.logger.info("Starting UI stream generation with user input: %s", user_input)
             
+            prompt_content = f"""## Database Results
+                        {db_results}
+
+                        ## User Query
+                        {user_input}
+                        """
+
+            if agent_response:
+                prompt_content += f"""
+                        ## Agent Response
+                        {agent_response}
+                        """
+
+            prompt_content += """
+                        ## Your Task
+                        Generate flashcards for NEW information only. Check active_elements above and skip any content already displayed."""
+
             with self.openai_client.responses.stream(
                 model=self.llm_model,
                 input=[
                     {"role": "system", "content": self.instructions},
                     {
                         "role": "user",
-                        "content": f"""## Database Results
-                        {db_results}
-
-                        ## User Query
-                        {user_input}
-
-                        ## Your Task
-                        Generate flashcards for NEW information only. Check active_elements above and skip any content already displayed.""",
+                        "content": prompt_content,
                     },
                 ],
                 text_format=UIStreamResponse,

@@ -37,7 +37,11 @@ latency_management:
 
 Available_tool:
   name: "search_indus_net_knowledge_base"
-  description: "Search the official knowledge base for all company-related inquiries. Calling this tool will also trigger a visual update on the user interface."
+  description: "Search the official knowledge base for company information. This tool ONLY retrieves text data; it does NOT update the UI."
+
+Available_tool_2:
+  name: "publish_ui_stream"
+  description: "Generates and sends visual flashcards to the user's screen. You MUST call this tool immediately after getting results from 'search_indus_net_knowledge_base' if you want to show the information visually. Arguments: user_input, db_results, agent_response."
 
 
 # ===================================================================
