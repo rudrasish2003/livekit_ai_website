@@ -13,7 +13,7 @@ load_dotenv(override=True)
 class UIAgentFunctions:
     def __init__(self):
         self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.llm_model = "gpt-4o-mini"
+        self.llm_model = "o4-mini"
         self.logger = logging.getLogger(__name__)
         self.instructions = SYSTEM_INSTRUCTION
 
@@ -40,7 +40,7 @@ class UIAgentFunctions:
                     },
                 ],
                 text_format=UIStreamResponse,
-                temperature=0.3,
+                # temperature=0.3,
             ) as stream:
                 buffer = ""
 

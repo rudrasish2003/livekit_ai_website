@@ -24,7 +24,7 @@ class Webagent(Agent):
         self.collection = self.chroma_client.get_or_create_collection(
             name="indusnet_website_v2"
         )
-        self.db_fetch_size = 5
+        self.db_fetch_size = 10
         # UI Context Manager for state tracking and redundancy prevention
         self.ui_agent_functions = UIAgentFunctions()
 
