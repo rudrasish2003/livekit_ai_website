@@ -11,6 +11,7 @@ interface OutboundCallModalProps {
 
 export function OutboundCallModal({ isOpen, onClose, agentType }: OutboundCallModalProps) {
     const [phoneNumber, setPhoneNumber] = useState<string | undefined>();
+    const [provider, setProvider] = useState<'exotel' | 'twilio'>('exotel');
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
@@ -39,6 +40,7 @@ export function OutboundCallModal({ isOpen, onClose, agentType }: OutboundCallMo
                 body: JSON.stringify({
                     phone_number: phoneNumber,
                     agent_type: agentType,
+                    call_from: provider,
                 }),
             });
 
@@ -146,6 +148,29 @@ export function OutboundCallModal({ isOpen, onClose, agentType }: OutboundCallMo
                                 <p className="text-xs text-gray-500 ml-1">
                                     Enter your number to receive a call from our AI agent.
                                 </p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="block text-sm font-medium text-gray-700 ml-1">
+                                    SIP Provider
+                                </label>
+                                <div className="grid grid-cols-2 gap-3 p-1 bg-gray-100 rounded-2xl relative">
+                                    <button
+                                        onClick={() => setProvider('exotel')}
+                                        className={`relative z-10 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${provider === 'exotel' ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        Exotel
+                                    </button>
+                                    <button
+                                        onClick={() => setProvider('twilio')}
+                                        className={`relative z-10 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${provider === 'twilio' ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        Twilio
+                                    </button>
+                                    <div
+                                        className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white shadow-sm rounded-xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${provider === 'exotel' ? 'left-1' : 'left-[calc(50%+2px)]'}`}
+                                    />
+                                </div>
                             </div>
 
                             {status === 'error' && (
