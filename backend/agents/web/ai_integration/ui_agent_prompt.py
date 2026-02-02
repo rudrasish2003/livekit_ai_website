@@ -71,12 +71,12 @@ Return ONLY a JSON object following this Pydantic structure:
 
 # MEDIA ASSET MAP (PRIORITY 1)
 If the content matches these entities, you MUST use these exact URLs:
+
+### IMAGES
 - **Indus Net Office**: "https://media.licdn.com/dms/image/v2/D5622AQEXFMOWHG9UEQ/feedshare-shrink_800/B56Zoqi1FHG4Ag-/0/1761650367301?e=2147483647&v=beta&t=exXz0i4LcAqW6E3yIHlA7mggZvz4pE2X3OWWq4Eecmw"
-- **Indus Net Intro Video**: "https://youtu.be/iOvGVR7Lo_A?si=p8j8c72qXh-wpm4Z" (Set mediaType: video)
 - **Kolkata Office**: "https://intglobal.com/wp-content/uploads/2025/06/image-134.webp"
 - **Abhishek Rungta (CEO)**: "https://intglobal.com/wp-content/uploads/2025/12/AR-Image-scaled-1.webp"
 - **Abhishek Rungta Signature**: "https://intglobal.com/wp-content/uploads/2025/01/Abhishek-Rungta-1.png"
-- **Abhishek Video**: "https://intglobal.com/wp-content/uploads/2025/06/Abhishek-Rungta-INT-Intro.mp4" (Set mediaType: video)
 - **Malcolm**: "https://intglobal.com/wp-content/uploads/2025/01/Ageas-Insurance.webp"
 - **Michael**: "https://intglobal.com/wp-content/uploads/2025/02/Michael-Schiener.webp"
 - **Roger**: "https://intglobal.com/wp-content/uploads/2025/02/Roger-Lawton.webp"
@@ -92,11 +92,17 @@ If the content matches these entities, you MUST use these exact URLs:
 - **Odoo Partner**: "https://intglobal.com/wp-content/uploads/2025/07/odoo-logo.png"
 - **Zoho Partner**: "https://intglobal.com/wp-content/uploads/2025/07/zoho-logo.png"
 - **Meta Partner**: "https://intglobal.com/wp-content/uploads/2025/07/meta-logo.png"
-- **Careers Video**: "https://www.youtube.com/watch?v=1pk9N_yS3lU&t=12s" (Set mediaType: video)
 - **Contact**: "https://intglobal.com/wp-content/uploads/2025/01/image-1226x1511-1.png"
 - **Customer Experience**: "https://www.gosurvey.in/media/a0vmcbf1/customer-experience-is-important-for-businesses.jpg"
 - **Digital Engineering**: "https://cdn.prod.website-files.com/6040a6f3bbe5b060a4c21ac5/66fd0df74a3e6a47084d11fe_66fd0df2d5e733b54c3dd828_unnamed%2520(8).jpeg"
 - **AI and Analytics**: "https://www.gooddata.com/img/blog/_1200x630/what-is-ai-analytics_cover.png.webp"
 - **Cloud and DevOps**: "https://ncplinc.com/includes/images/blog/ncpl-open-source-devops-tools.png"
 - **Cybersecurity**: "https://www.dataguard.com/hubfs/240326_Blogpost_CybersecurityMeasures%20(1).webp"
+- **Global Map**: "https://i.pinimg.com/564x/4e/9f/64/4e9f64e490a5fa034082d107ecbb5faf.jpg"
+
+### VIDEOS
+- **Indus Net Intro Video**: "https://youtu.be/iOvGVR7Lo_A?si=p8j8c72qXh-wpm4Z" (Set mediaType: video)
+- **Abhishek Rungta Video**: "https://intglobal.com/wp-content/uploads/2025/06/Abhishek-Rungta-INT-Intro.mp4" (Set mediaType: video)
+- **Careers Video**: "https://www.youtube.com/watch?v=1pk9N_yS3lU&t=12s" (Set mediaType: video)
+
 """
