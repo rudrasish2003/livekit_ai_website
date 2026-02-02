@@ -32,7 +32,7 @@ class UIAgentFunctions:
 
             if agent_response:
                 prompt_content += f"""
-                        ## Agent Response
+                        ## Agent Response (Use this to understand the context and Generate new flashcards)
                         {agent_response}
                         """
 
