@@ -9,9 +9,10 @@ from fastapi import FastAPI, Query, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, JSONResponse
 from livekit import api as lk_api
-from livekit.api import LiveKitAPI, ListRoomsRequest
+from livekit.api import LiveKitAPI, ListRoomsRequest , CreateRoomRequest
 from pydantic import BaseModel
-from api_data_structure.structure import OutboundCallRequest, OutboundTrunkCreate
+from api_data_structure.structure import OutboundCallRequest, OutboundTrunkCreate, SIPTestRequest
+import asyncio
 
 # Import the outbound call function
 from outbound.outbound_call import OutboundCall
@@ -55,16 +56,39 @@ async def get_rooms() -> list[str]:
         logger.info("Closed LiveKitAPI client in get_rooms")
 
 
+async def create_room(room_name: str) -> None:
+    logger.info(f"Creating room: {room_name}")
+    lkapi = LiveKitAPI()
+    try:
+        _ = await lkapi.room.create_room(CreateRoomRequest(
+            name=room_name,
+            empty_timeout=1 * 60,
+            max_participants=6,
+        ))
+    except Exception as e:
+        logger.error(f"Error in create_room: {e}", exc_info=True)
+    finally:
+        await lkapi.aclose()
+        logger.info("Closed LiveKitAPI client in create_room", exc_info=True)
+
+
 async def generate_room_name(agent: str) -> str:
     """
     Generate a unique room per user, namespaced by agent.
     Example: web-a1b2c3d4
     """
-    while True:
-        room_name = f"{agent}-{uuid.uuid4().hex[:8]}"
-        existing_rooms = await get_rooms()
-        if room_name not in existing_rooms:
-            return room_name
+    room_name = f"{agent}-{uuid.uuid4().hex[:8]}"
+    await create_room(room_name)
+    return room_name
+        
+    # while True:
+    #     room_name = f"{agent}-{uuid.uuid4().hex[:8]}"
+    #     # existing_rooms = await get_rooms()
+    #     # if room_name not in existing_rooms:
+    #     #     return room_name
+    #     await create_room(room_name)
+    #     return room_name
+        
 
 
 @app.get("/api/getToken", response_class=PlainTextResponse)
@@ -178,6 +202,42 @@ async def get_inbound_agent(phone_number: str = Query(...)):
 @app.get("/health", response_class=PlainTextResponse)
 async def health():
     return "ok"
+
+# Test SIP
+from sip_test import make_exotel_call
+
+# {
+#   "exotel_ip": "pstn.in4.exotel.com",
+#   "exotel_port": 5070,
+#   "customer_ip": "13.234.150.174",
+#   "customer_port": 5061,
+#   "media_ip": "13.234.150.174",
+#   "rtp_port": 18232,
+#   "caller": "+918044319240",
+#   "callee": "+918697421450"
+# }
+
+@app.post("/api/testsip")
+async def trigger_sip_test_call(data: SIPTestRequest):
+    logger.info(f"Received SIP test call request: {data}")
+        
+    try:
+        # Since make_exotel_call uses blocking sockets, run it in a thread
+        res = await asyncio.to_thread(
+            make_exotel_call,
+            exotel_ip=data.exotel_ip,
+            exotel_port=data.exotel_port,
+            customer_ip=data.customer_ip,
+            customer_port=data.customer_port,
+            media_ip=data.media_ip,
+            rtp_port=data.rtp_port,
+            caller=data.caller,
+            callee=data.callee
+        )
+        return res
+    except Exception as e:
+        logger.error(f"Failed to initiate SIP test call: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
