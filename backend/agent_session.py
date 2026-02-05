@@ -230,8 +230,10 @@ async def my_agent(ctx: JobContext):
         logger.warning(f"Could not start background audio: {e}", exc_info=True)
 
     # --- INITIATING SPEECH (Dynamically changed based on agent) ---
-    welcome_message = agent_instance.welcome_message
-    await session.say(text=welcome_message, allow_interruptions=True)
+    # If agent = ambuja no welcome message
+    if agent_type != "ambuja":
+        welcome_message = agent_instance.welcome_message
+        await session.say(text=welcome_message, allow_interruptions=True)
 
     # --- KEEP ALIVE LOOP ---
     # Without this, the function returns and the agent process terminates.
