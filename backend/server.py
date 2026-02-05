@@ -9,7 +9,7 @@ from fastapi import FastAPI, Query, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, JSONResponse
 from livekit import api as lk_api
-from livekit.api import LiveKitAPI, ListRoomsRequest
+from livekit.api import LiveKitAPI, ListRoomsRequest , CreateRoomRequest
 from pydantic import BaseModel
 from api_data_structure.structure import OutboundCallRequest, OutboundTrunkCreate, SIPTestRequest
 import asyncio
@@ -56,16 +56,39 @@ async def get_rooms() -> list[str]:
         logger.info("Closed LiveKitAPI client in get_rooms")
 
 
+async def create_room(room_name: str) -> None:
+    logger.info(f"Creating room: {room_name}")
+    lkapi = LiveKitAPI()
+    try:
+        _ = await lkapi.room.create_room(CreateRoomRequest(
+            name=room_name,
+            empty_timeout=1 * 60,
+            max_participants=6,
+        ))
+    except Exception as e:
+        logger.error(f"Error in create_room: {e}", exc_info=True)
+    finally:
+        await lkapi.aclose()
+        logger.info("Closed LiveKitAPI client in create_room", exc_info=True)
+
+
 async def generate_room_name(agent: str) -> str:
     """
     Generate a unique room per user, namespaced by agent.
     Example: web-a1b2c3d4
     """
-    while True:
-        room_name = f"{agent}-{uuid.uuid4().hex[:8]}"
-        existing_rooms = await get_rooms()
-        if room_name not in existing_rooms:
-            return room_name
+    room_name = f"{agent}-{uuid.uuid4().hex[:8]}"
+    await create_room(room_name)
+    return room_name
+        
+    # while True:
+    #     room_name = f"{agent}-{uuid.uuid4().hex[:8]}"
+    #     # existing_rooms = await get_rooms()
+    #     # if room_name not in existing_rooms:
+    #     #     return room_name
+    #     await create_room(room_name)
+    #     return room_name
+        
 
 
 @app.get("/api/getToken", response_class=PlainTextResponse)
