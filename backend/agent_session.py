@@ -108,7 +108,7 @@ async def vyom_demos(ctx: JobContext):
 
         # Configure room options
         room_options = room_io.RoomOptions(
-            text_input=True,
+            text_input=False,  # Disabled: RealtimeModel handles transcription
             audio_input=True,
             audio_output=True,
             close_on_disconnect=True,
