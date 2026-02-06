@@ -8,8 +8,14 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Query, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, JSONResponse
-from livekit import api as lk_api
-from livekit.api import LiveKitAPI, ListRoomsRequest , CreateRoomRequest
+from livekit.api import (
+    LiveKitAPI, 
+    ListRoomsRequest, 
+    CreateRoomRequest, 
+    AccessToken, 
+    VideoGrants, 
+    CreateAgentDispatchRequest
+)
 from pydantic import BaseModel
 from api_data_structure.structure import OutboundCallRequest, OutboundTrunkCreate, SIPTestRequest
 import asyncio
@@ -43,27 +49,66 @@ outbound_call = OutboundCall()
 
 async def get_rooms() -> list[str]:
     logger.info("Starting get_rooms")
-    client = LiveKitAPI()
+    lkapi = LiveKitAPI(
+        os.getenv("LIVEKIT_URL"),
+        os.getenv("LIVEKIT_API_KEY"),
+        os.getenv("LIVEKIT_API_SECRET"),
+    )
     try:
-        rooms = await client.room.list_rooms(ListRoomsRequest())
+        rooms = await lkapi.room.list_rooms(ListRoomsRequest())
         logger.info(f"Retrieved rooms: {[room.name for room in rooms.rooms]}")
         return [room.name for room in rooms.rooms]
     except Exception as e:
         logger.error(f"Error in get_rooms: {e}", exc_info=True)
         return []
     finally:
-        await client.aclose()
+        await lkapi.aclose()
         logger.info("Closed LiveKitAPI client in get_rooms")
 
 
-async def create_room(room_name: str) -> None:
+async def dispatch_request(room: str, agent: str):
+    logger.info(f"Dispatching agent={agent} to room={room}")
+
+    lkapi = LiveKitAPI(
+        os.getenv("LIVEKIT_URL"),
+        os.getenv("LIVEKIT_API_KEY"),
+        os.getenv("LIVEKIT_API_SECRET"),
+    )
+
+    try:
+        await lkapi.agent_dispatch.create_dispatch(
+            CreateAgentDispatchRequest(
+                room=room,
+                agent_name=agent,
+                metadata=json.dumps({
+                    "agent": agent,
+                    "source": "token_server"
+                }),
+            )
+        )
+        logger.info(f"Agent dispatched | agent={agent} room={room}")
+
+    except Exception as e:
+        logger.error(f"Agent dispatch failed: {e}", exc_info=True)
+
+    finally:
+        await lkapi.aclose()
+
+
+
+async def create_room(room_name: str, agent: str) -> None:
     logger.info(f"Creating room: {room_name}")
-    lkapi = LiveKitAPI()
+    lkapi = LiveKitAPI(
+        os.getenv("LIVEKIT_URL"),
+        os.getenv("LIVEKIT_API_KEY"),
+        os.getenv("LIVEKIT_API_SECRET"),
+    )
     try:
         _ = await lkapi.room.create_room(CreateRoomRequest(
             name=room_name,
-            empty_timeout=1 * 60,
-            max_participants=6,
+            empty_timeout=1 * 30,
+            max_participants=2,
+            metadata=json.dumps({"agent": agent})
         ))
     except Exception as e:
         logger.error(f"Error in create_room: {e}", exc_info=True)
@@ -78,7 +123,8 @@ async def generate_room_name(agent: str) -> str:
     Example: web-a1b2c3d4
     """
     room_name = f"{agent}-{uuid.uuid4().hex[:8]}"
-    await create_room(room_name)
+    await create_room(room_name, agent)
+    await dispatch_request(room_name, "vyom_demos")
     return room_name
         
     # while True:
@@ -103,12 +149,12 @@ async def get_token(name: str = Query("guest"), agent: str = Query("web") ,room:
 
     try:
         token = (
-            lk_api.AccessToken(os.getenv("LIVEKIT_API_KEY"), os.getenv("LIVEKIT_API_SECRET"))
+            AccessToken(os.getenv("LIVEKIT_API_KEY"), os.getenv("LIVEKIT_API_SECRET"))
             .with_identity(name)
             .with_name(name)
             .with_metadata(json.dumps({"agent": agent}))
             .with_grants(
-                lk_api.VideoGrants(
+                VideoGrants(
                     room_join=True,
                     room=room,
                 )
