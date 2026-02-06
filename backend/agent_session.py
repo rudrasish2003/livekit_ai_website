@@ -48,7 +48,7 @@ async def vyom_demos(ctx: JobContext):
 
     # Retrive agent name from room name
     room_name = ctx.room.name
-    agent_type = room_name.split("-")[0]
+    agent_type = room_name.split("-")[0].lower()
     logger.info(f"Agent session starting | room: {room_name} | agent_type: {agent_type}")
 
     # Initialize correct agent from the start
@@ -125,9 +125,17 @@ async def vyom_demos(ctx: JobContext):
         # WAIT for participant
         logger.info("Waiting for participant...")
         participant = await ctx.wait_for_participant()
-        logger.info(
-            f"Participant joined: {participant.identity}, kind={participant.kind}, metadata={participant.metadata}"
-        )
+
+        is_sip = participant.kind == rtc.ParticipantKind.PARTICIPANT_KIND_SIP
+        logger.info(f"Participant joined: {participant.identity}, kind={participant.kind}, is_sip={is_sip}")
+
+        audio_ready = asyncio.Event()
+
+        @ctx.room.on("track_published")
+        def on_track_published(publication: rtc.RemoteTrackPublication, p: rtc.RemoteParticipant):
+            if p.identity == participant.identity and publication.kind == rtc.TrackKind.KIND_AUDIO:
+                logger.info("SIP audio track published — call answered")
+                audio_ready.set()
 
         # --- Background Audio Start ---
         try:
@@ -143,6 +151,12 @@ async def vyom_demos(ctx: JobContext):
 
         # --- INITIATING SPEECH ---
         if agent_type != "ambuja":
+            if is_sip:
+                logger.info("Waiting for SIP call to be answered...")
+                await audio_ready.wait()
+                # Short buffer for RTP stabilization
+                await asyncio.sleep(0.5)
+
             welcome_message = agent_instance.welcome_message
             logger.info(f"Sending welcome message: '{welcome_message}' for agent: {agent_type}")
             try:
