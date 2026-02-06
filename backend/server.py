@@ -43,7 +43,11 @@ outbound_call = OutboundCall()
 
 async def get_rooms() -> list[str]:
     logger.info("Starting get_rooms")
-    client = LiveKitAPI()
+    client = LiveKitAPI(
+        os.getenv("LIVEKIT_URL"),
+        os.getenv("LIVEKIT_API_KEY"),
+        os.getenv("LIVEKIT_API_SECRET"),
+    )
     try:
         rooms = await client.room.list_rooms(ListRoomsRequest())
         logger.info(f"Retrieved rooms: {[room.name for room in rooms.rooms]}")
@@ -58,7 +62,11 @@ async def get_rooms() -> list[str]:
 
 async def create_room(room_name: str, agent: str) -> None:
     logger.info(f"Creating room: {room_name}")
-    lkapi = LiveKitAPI()
+    lkapi = LiveKitAPI(
+        os.getenv("LIVEKIT_URL"),
+        os.getenv("LIVEKIT_API_KEY"),
+        os.getenv("LIVEKIT_API_SECRET"),
+    )
     try:
         _ = await lkapi.room.create_room(CreateRoomRequest(
             name=room_name,

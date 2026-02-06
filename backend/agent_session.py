@@ -28,7 +28,7 @@ import os
 import json
 import asyncio
 from typing import cast
-from inbound.config_manager import get_agent_for_number
+
 
 logger = logging.getLogger("agent")
 load_dotenv(override=True)
@@ -59,15 +59,13 @@ server = AgentServer(
 @server.rtc_session()
 async def my_agent(ctx: JobContext):
 
-    # READ FROM ROOM METADATA IMMEDIATELY - no waiting needed!
-    room_metadata = json.loads(ctx.room.metadata or "{}")
-    logger.info(f"Room metadata: {room_metadata}")
-    agent_type = room_metadata.get("agent", "invoice")
-
-    logger.info(f"Agent type from room metadata: {agent_type}")
+    # Retrive agent name from room name
+    room_name = ctx.room.name
+    agent_type = room_name.split("-")[0]
+    logger.info(f"Agent type from room name: {agent_type}")
 
     # Initialize correct agent from the start
-    AgentClass = AGENT_TYPES.get(agent_type, InvoiceAgent)
+    AgentClass = AGENT_TYPES.get(agent_type, AmbujaAgent)
     agent_instance = AgentClass(room=ctx.room)
 
     logger.info(f"Initialized {AgentClass.__name__} for room")
@@ -110,20 +108,6 @@ async def my_agent(ctx: JobContext):
         use_tts_aligned_transcript=False,
     )
 
-    # # --- Custom Background Audio Setup ---
-    # background_audio = BackgroundAudioPlayer(
-    #     ambient_sound=AudioConfig(
-    #         os.path.join(
-    #             os.path.dirname(__file__), "bg_audio", "office-ambience_48k.wav"
-    #         ),
-    #         volume=0.4,
-    #     ),
-    #     thinking_sound=AudioConfig(
-    #         os.path.join(os.path.dirname(__file__), "bg_audio", "typing-sound_48k.wav"),
-    #         volume=0.5,
-    #     ),
-    # )
-
     # --- START SESSION ---
     logger.info("Starting AgentSession...")
     try:
@@ -151,44 +135,6 @@ async def my_agent(ctx: JobContext):
             f"Participant joined: {participant.identity}, kind={participant.kind}, metadata={participant.metadata}"
         )
 
-        # # Determine agent type based on room metadata or fallback to "invoice"
-        # agent_type = "invoice"
-        
-        # # Check if SIP call
-        # if participant.kind == rtc.ParticipantKind.PARTICIPANT_KIND_SIP:
-        #     logger.info("SIP Participant detected")
-        #     if participant.metadata and participant.metadata.strip():
-        #         try:
-        #             metadata = json.loads(participant.metadata)
-        #             if metadata.get("call_type") == "outbound":
-        #                 agent_type = metadata.get("agent", "invoice")
-        #                 logger.info(f"Outbound SIP call, agent_type={agent_type}")
-        #         except Exception as e:
-        #             logger.error(f"Error parsing SIP metadata: {e}")
-        #     else:
-        #         called_number = participant.attributes.get("sip.trunkPhoneNumber")
-        #         logger.info(f"Inbound SIP call to: {called_number}")
-        #         if called_number:
-        #             mapped_agent = get_agent_for_number(called_number)
-        #             if mapped_agent:
-        #                 agent_type = mapped_agent
-        #                 logger.info(f"Mapped SIP number to agent: {agent_type}")
-        # else:
-        #     # Web call
-        #     try:
-        #         agent_type = json.loads(participant.metadata).get("agent", "invoice")
-        #         logger.info(f"Web call, agent_type={agent_type}")
-        #     except Exception:
-        #         logger.warning("Could not parse agent_type from web participant metadata, defaulting to 'invoice'")
-
-        # # Initialize the specific Agent Class
-        # AgentClass = AGENT_TYPES.get(agent_type, InvoiceAgent)
-        # logger.info(f"Initializing Agent instance for: {agent_type} ({AgentClass.__name__})")
-        # agent_instance = AgentClass(room=ctx.room)
-
-        # Attach the agent to the session
-        # session.update_agent(agent=agent_instance)
-        # logger.info(f"Agent session updated with {agent_type} instance")
 
         # --- Background Audio Start ---
         background_audio = BackgroundAudioPlayer(

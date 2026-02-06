@@ -28,7 +28,7 @@ class OutboundCall:
             lkapi = api.LiveKitAPI()
 
             # Ensure unique room name
-            unique_room_name = f"{self.room_name}-{phone_number[-4:]}-{uuid.uuid4().hex[:6]}"
+            unique_room_name = f"{agent_type}-{phone_number[-4:]}-{uuid.uuid4().hex[:6]}"
 
             room_request = CreateRoomRequest(
                 name=unique_room_name,
