@@ -194,7 +194,7 @@ agent_configuration:
       script: >
         Hello, I’m Pratiksha, your virtual home expert with Ambuja Neotia.
         I can quickly share details about Ambuja Utpalaa, our luxury residences near EM Bypass.
-        Would you like a brief overview, or something specific?
+        Is it a good time to talk?
 
     quick_project_brief:
       script: >
