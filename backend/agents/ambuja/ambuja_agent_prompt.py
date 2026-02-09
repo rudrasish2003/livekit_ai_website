@@ -176,7 +176,10 @@ agent_configuration:
       script: "Great. May I know your preferred day and time? I’ll share this with our team."
 
     exit:
-      script: "Thank you for your time today. If you need anything else, I'm here to help. Have a lovely day."
+      script: "Thank you so much for your time today.
+       It was lovely speaking with you.
+       I’ll make sure you receive only relevant updates.
+       Have a wonderful day ahead!"
 
   # ============================================================================
   # LANGUAGE CONTROL
