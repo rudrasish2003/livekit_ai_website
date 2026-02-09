@@ -24,7 +24,6 @@ from livekit.plugins.openai import realtime
 from openai.types.realtime import AudioTranscription
 import os
 import asyncio
-from typing import cast
 
 
 logger = logging.getLogger("agent")
@@ -75,12 +74,12 @@ async def vyom_demos(ctx: JobContext):
             interrupt_response=True,
         ),
         modalities=["text"],
-        api_key=cast(str, os.getenv("OPENAI_API_KEY")),
+        api_key=os.getenv("OPENAI_API_KEY", ""),
     )
     tts = cartesia.TTS(
         model="sonic-3", 
-        voice="f6141af3-5f94-418c-80ed-a45d450e7e2e",
-        api_key=os.getenv("CARTESIA_API_KEY"),
+        voice=os.getenv("CARTESIA_VOICE_ID", ""),
+        api_key=os.getenv("CARTESIA_API_KEY", ""),
         )
     
     session = AgentSession(
