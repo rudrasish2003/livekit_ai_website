@@ -137,7 +137,7 @@ agent_configuration:
       outdoors: ["Joggers park", "Landscaped gardens", "Three acre podium"]
 
     pricing:
-      three_bhk: "Starting from two point two one crore rupees onwards."
+      three_bhk: "Starting from two point three four crore rupees onwards."
       four_bhk: "Price on request."
       duplex: "Price on request."
 
@@ -176,7 +176,10 @@ agent_configuration:
       script: "Great. May I know your preferred day and time? I’ll share this with our team."
 
     exit:
-      script: "Thank you for your time today. If you need anything else, I'm here to help. Have a lovely day."
+      script: "Thank you so much for your time today.
+       It was lovely speaking with you.
+       I’ll make sure you receive only relevant updates.
+       Have a wonderful day ahead!"
 
   # ============================================================================
   # LANGUAGE CONTROL
