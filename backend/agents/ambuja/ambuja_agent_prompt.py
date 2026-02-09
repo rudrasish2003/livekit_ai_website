@@ -190,11 +190,15 @@ agent_configuration:
   # ============================================================================
   conversation_flow:
 
-    opening:
+    opening after the user's inintaial response:
       script: >
         Hello, I’m Pratiksha, your virtual home expert with Ambuja Neotia.
-        I can quickly share details about Ambuja Utpalaa, our luxury residences near EM Bypass.
+        Is it a good time to talk?
+      If user says yes then :-
+        I can quickly share details about Ambuja Utpala, our luxury residences near EM Bypass.
         Would you like a brief overview, or something specific?
+      If the user says no then :-
+        No problem. When would be a better time to connect?
 
     quick_project_brief:
       script: >
