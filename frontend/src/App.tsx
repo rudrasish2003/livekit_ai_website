@@ -61,7 +61,7 @@ function LegacyAgentPage({ agentType }: { agentType: AgentType }) {
         setToken('');
         sessionStorage.removeItem('livekit_token');
         sessionStorage.removeItem('agent_type');
-        window.location.href = '/';
+        window.location.href = agentType === 'hirebot' ? '/hirebot' : '/';
       }}
     >
       <VoiceAssistant />
